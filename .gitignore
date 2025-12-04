@@ -205,3 +205,23 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ==================== PROJECT SPECIFIC ====================
+# Data files (too large for git)
+data/raw/
+data/processed/
+*.zip
+
+# Model checkpoints and experiments
+experiments/
+*.pt
+*.pth
+*.ckpt
+
+# Reports and figures (generated)
+reports/figures/*.png
+reports/figures/*.jpg
+
+# Temporary files
+*.tmp
+temp/
