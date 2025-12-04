@@ -56,6 +56,10 @@ class CombinedLoss(nn.Module):
         self.bce_loss = nn.BCEWithLogitsLoss()
     
     def forward(self, pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        # Ensure target has same shape as pred: [B, 1, H, W]
+        if target.dim() == 3:
+            target = target.unsqueeze(1)
+        
         dice = self.dice_loss(pred, target)
         bce = self.bce_loss(pred, target)
         return self.dice_weight * dice + self.bce_weight * bce
