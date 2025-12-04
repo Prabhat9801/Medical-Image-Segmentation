@@ -2,6 +2,7 @@
 __pycache__/
 *.py[codz]
 *$py.class
+isic_processed_256.zip
 
 # C extensions
 *.so
