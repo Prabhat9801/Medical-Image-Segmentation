@@ -4,6 +4,7 @@ Generates predictions and calculates metrics on test set.
 """
 
 import os
+import sys
 import argparse
 import json
 import torch
@@ -12,14 +13,17 @@ from PIL import Image
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
+# Add src to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 # Import models
-from models.unet import UNet
-from models.unetpp import UNetPlusPlus
-from models.transunet import TransUNet
+from src.models.unet import UNet
+from src.models.unetpp import UNetPlusPlus
+from src.models.transunet import TransUNet
 
 # Import dataset and utils
-from datasets.isic_dataset import ISICDataset, get_val_transforms
-from utils import (
+from src.datasets.isic_dataset import ISICDataset, get_val_transforms
+from src.utils import (
     dice_coefficient,
     iou_score,
     pixel_accuracy,

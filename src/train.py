@@ -4,6 +4,7 @@ Supports UNet, UNet++, and TransUNet with different data fractions.
 """
 
 import os
+import sys
 import argparse
 import json
 from datetime import datetime
@@ -14,14 +15,17 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 import numpy as np
 
+# Add src to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 # Import models
-from models.unet import UNet
-from models.unetpp import UNetPlusPlus
-from models.transunet import TransUNet
+from src.models.unet import UNet
+from src.models.unetpp import UNetPlusPlus
+from src.models.transunet import TransUNet
 
 # Import dataset and utils
-from datasets.isic_dataset import create_dataloaders
-from utils import (
+from src.datasets.isic_dataset import create_dataloaders
+from src.utils import (
     CombinedLoss,
     dice_coefficient,
     iou_score,
