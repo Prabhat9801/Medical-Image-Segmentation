@@ -22,8 +22,8 @@ def evaluate_experiment(exp_dir):
         print(f"⚠️  Could not determine model from: {exp_name}")
         return False
     
-    # Find checkpoint file
-    checkpoint_path = os.path.join(exp_dir, 'best_model.pth')
+    # Find checkpoint file (it's .pt not .pth!)
+    checkpoint_path = os.path.join(exp_dir, 'best_model.pt')
     
     if not os.path.exists(checkpoint_path):
         print(f"⚠️  Checkpoint not found: {checkpoint_path}")
