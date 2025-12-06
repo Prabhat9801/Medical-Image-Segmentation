@@ -75,8 +75,8 @@ def get_model(model_name: str, device: str):
     return model
 
 
-def train_epoch(model, loader, criterion, optimizer, device, epoch):
-    """Train for one epoch."""
+def train_epoch(model, loader, criterion, optimizer, device, epoch, scaler=None):
+    """Train for one epoch with optional mixed precision."""
     model.train()
     
     running_loss = 0.0
@@ -89,16 +89,22 @@ def train_epoch(model, loader, criterion, optimizer, device, epoch):
         images = images.to(device)
         masks = masks.to(device)
         
-        # Forward pass
         optimizer.zero_grad()
-        outputs = model(images)
         
-        # Calculate loss
-        loss = criterion(outputs, masks)
-        
-        # Backward pass
-        loss.backward()
-        optimizer.step()
+        # Mixed precision training
+        if scaler is not None:
+            with torch.cuda.amp.autocast():
+                outputs = model(images)
+                loss = criterion(outputs, masks)
+            
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+        else:
+            outputs = model(images)
+            loss = criterion(outputs, masks)
+            loss.backward()
+            optimizer.step()
         
         # Calculate metrics
         with torch.no_grad():
@@ -207,6 +213,11 @@ def train(args):
     criterion = CombinedLoss(dice_weight=0.5, bce_weight=0.5)
     optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     
+    # Mixed precision training scaler (for 2x speedup on GPU)
+    scaler = torch.cuda.amp.GradScaler() if device.type == 'cuda' else None
+    if scaler:
+        print("✅ Mixed precision training enabled (FP16)")
+    
     # Learning rate scheduler
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs, eta_min=1e-6)
     
@@ -230,7 +241,7 @@ def train(args):
     for epoch in range(1, args.epochs + 1):
         # Train
         train_loss, train_dice, train_iou = train_epoch(
-            model, train_loader, criterion, optimizer, device, epoch
+            model, train_loader, criterion, optimizer, device, epoch, scaler
         )
         
         # Validate
@@ -327,7 +338,7 @@ def main():
                         help='Weight decay')
     
     # System arguments
-    parser.add_argument('--num_workers', type=int, default=4,
+    parser.add_argument('--num_workers', type=int, default=2,
                         help='Number of data loading workers')
     parser.add_argument('--exp_dir', type=str, default='experiments',
                         help='Experiment directory')
