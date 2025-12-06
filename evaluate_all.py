@@ -4,16 +4,15 @@ Extracts model name and finds checkpoint from experiment directory.
 """
 
 import os
-import glob
+import sys
 import subprocess
-import json
 
 def evaluate_experiment(exp_dir):
     """Evaluate a single experiment"""
     exp_name = os.path.basename(exp_dir)
     
     # Extract model name from directory name
-    if exp_name.startswith('unet_'):
+    if exp_name.startswith('unet_') and not exp_name.startswith('unetpp_'):
         model = 'unet'
     elif exp_name.startswith('unetpp_'):
         model = 'unetpp'
@@ -28,6 +27,11 @@ def evaluate_experiment(exp_dir):
     
     if not os.path.exists(checkpoint_path):
         print(f"⚠️  Checkpoint not found: {checkpoint_path}")
+        # List what files ARE in the directory
+        print(f"   Files in {exp_dir}:")
+        if os.path.exists(exp_dir):
+            for f in os.listdir(exp_dir):
+                print(f"     - {f}")
         return False
     
     # Check if already evaluated
@@ -43,27 +47,36 @@ def evaluate_experiment(exp_dir):
     print(f"Checkpoint: {checkpoint_path}")
     print(f"{'='*60}\n")
     
+    # Build command
     cmd = [
-        'python', '-m', 'src.eval',
+        sys.executable, '-m', 'src.eval',
         '--model', model,
         '--checkpoint', checkpoint_path,
         '--output_dir', exp_dir,
         '--num_vis', '8'
     ]
     
+    print(f"Running command: {' '.join(cmd)}\n")
+    
     try:
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        print(result.stdout)
+        result = subprocess.run(cmd, check=True, capture_output=False, text=True)
         print(f"\n✅ {exp_name} evaluation complete!")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"\n❌ Error evaluating {exp_name}:")
-        print(e.stderr)
+        print(f"\n❌ Error evaluating {exp_name}")
+        print(f"Return code: {e.returncode}")
+        return False
+    except Exception as e:
+        print(f"\n❌ Unexpected error: {e}")
         return False
 
 def main():
     """Evaluate all experiments"""
     exp_base_dir = "/content/Medical-Image-Segmentation/experiments"
+    
+    # Also try local path if Colab path doesn't exist
+    if not os.path.exists(exp_base_dir):
+        exp_base_dir = "experiments"
     
     if not os.path.exists(exp_base_dir):
         print(f"❌ Experiments directory not found: {exp_base_dir}")
