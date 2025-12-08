@@ -6,6 +6,14 @@
 
 Deep learning-based medical image segmentation using UNet, UNet++, and TransUNet architectures on the ISIC 2018 skin lesion dataset.
 
+## 🌐 Live Demo
+
+**Try the model now!** 👉 [**Skin Lesion Segmentation App**](https://huggingface.co/spaces/Prabhat9801/Skin-Lesion-Segmentation)
+
+Upload a dermoscopic image and get instant AI-powered segmentation results with our best performing UNet++ model (86.08% Dice Score).
+
+[![Open in Spaces](https://img.shields.io/badge/🤗-Open%20in%20Spaces-blue)](https://huggingface.co/spaces/Prabhat9801/Skin-Lesion-Segmentation)
+
 ## 🎯 Project Overview
 
 This project implements and compares three state-of-the-art deep learning architectures for medical image segmentation:
