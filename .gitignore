@@ -219,10 +219,6 @@ experiments/
 *.pth
 *.ckpt
 
-# Reports and figures (generated)
-reports/figures/*.png
-reports/figures/*.jpg
-
 # Temporary files
 *.tmp
 temp/
