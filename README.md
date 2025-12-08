@@ -35,13 +35,13 @@ This project implements and compares three state-of-the-art deep learning archit
 
 ### Performance Visualizations
 
-<p align="center">
-  <img src="reports/figures/results_comparison.png" alt="Results Comparison" width="800"/>
-</p>
+#### Results Comparison
+![Results Comparison](https://raw.githubusercontent.com/Prabhat9801/Medical-Image-Segmentation/main/reports/figures/results_comparison.png)
 
-<p align="center">
-  <img src="reports/figures/performance_trends.png" alt="Performance Trends" width="800"/>
-</p>
+#### Performance Trends
+![Performance Trends](https://raw.githubusercontent.com/Prabhat9801/Medical-Image-Segmentation/main/reports/figures/performance_trends.png)
+
+*For detailed analysis, see [PROJECT_ACHIEVEMENTS.md](PROJECT_ACHIEVEMENTS.md)*
 
 ## 🚀 Quick Start
 
