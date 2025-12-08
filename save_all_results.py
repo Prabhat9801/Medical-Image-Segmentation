@@ -17,10 +17,24 @@ results_dir = "/content/Medical-Image-Segmentation/experiments"
 drive_final_dir = "/content/drive/MyDrive/medical_segmentation_results/final_results"
 local_reports_dir = "/content/Medical-Image-Segmentation/reports"
 
+# Check if Drive is mounted
+drive_mounted = os.path.exists("/content/drive/MyDrive")
+if not drive_mounted:
+    print("⚠️  Google Drive not mounted. Results will be saved locally only.")
+    print("   To save to Drive, mount it first with: from google.colab import drive; drive.mount('/content/drive')")
+    drive_final_dir = None
+
 # Create directories
-os.makedirs(drive_final_dir, exist_ok=True)
 os.makedirs(local_reports_dir, exist_ok=True)
 os.makedirs(f"{local_reports_dir}/figures", exist_ok=True)
+
+if drive_final_dir and drive_mounted:
+    try:
+        os.makedirs(drive_final_dir, exist_ok=True)
+        print(f"✅ Google Drive directory created: {drive_final_dir}")
+    except Exception as e:
+        print(f"⚠️  Could not create Drive directory: {e}")
+        drive_final_dir = None
 
 print("="*80)
 print("📊 COLLECTING AND SAVING ALL RESULTS")
@@ -340,21 +354,23 @@ with open(report_file, 'w') as f:
     f.write(report_md)
 print(f"✅ Report saved: {report_file}")
 
-# Copy everything to Google Drive
-print("\n📁 Copying all results to Google Drive...")
-
-# Copy reports
-shutil.copytree(local_reports_dir, f"{drive_final_dir}/reports", dirs_exist_ok=True)
-print(f"✅ Reports copied to Drive")
-
-# Copy all experiments
-shutil.copytree(results_dir, f"{drive_final_dir}/experiments", dirs_exist_ok=True)
-print(f"✅ Experiments copied to Drive")
-
-# Create a summary file in Drive root
-summary_file = f"{drive_final_dir}/README.txt"
-with open(summary_file, 'w') as f:
-    f.write(f"""Medical Image Segmentation - Results Summary
+# Copy everything to Google Drive (if mounted)
+if drive_final_dir and drive_mounted:
+    print("\n📁 Copying all results to Google Drive...")
+    
+    try:
+        # Copy reports
+        shutil.copytree(local_reports_dir, f"{drive_final_dir}/reports", dirs_exist_ok=True)
+        print(f"✅ Reports copied to Drive")
+        
+        # Copy all experiments
+        shutil.copytree(results_dir, f"{drive_final_dir}/experiments", dirs_exist_ok=True)
+        print(f"✅ Experiments copied to Drive")
+        
+        # Create a summary file in Drive root
+        summary_file = f"{drive_final_dir}/README.txt"
+        with open(summary_file, 'w') as f:
+            f.write(f"""Medical Image Segmentation - Results Summary
 ============================================
 
 Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
@@ -373,17 +389,36 @@ Files:
 - experiments/ - All trained models and evaluations
 
 """)
-print(f"✅ Summary saved to Drive")
-
-print("\n" + "="*80)
-print("🎉 ALL RESULTS SAVED SUCCESSFULLY!")
-print("="*80)
-print(f"\n📁 Google Drive Location: {drive_final_dir}")
-print(f"\nContents:")
-print(f"  - reports/FINAL_REPORT.md")
-print(f"  - reports/results_summary.csv")
-print(f"  - reports/results_detailed.csv")
-print(f"  - reports/figures/results_comparison.png")
-print(f"  - reports/figures/performance_trends.png")
-print(f"  - experiments/ (all {len(result_files)} experiments)")
-print("\n" + "="*80)
+        print(f"✅ Summary saved to Drive")
+        
+        print("\n" + "="*80)
+        print("🎉 ALL RESULTS SAVED SUCCESSFULLY!")
+        print("="*80)
+        print(f"\n📁 Google Drive Location: {drive_final_dir}")
+        print(f"\nContents:")
+        print(f"  - reports/FINAL_REPORT.md")
+        print(f"  - reports/results_summary.csv")
+        print(f"  - reports/results_detailed.csv")
+        print(f"  - reports/figures/results_comparison.png")
+        print(f"  - reports/figures/performance_trends.png")
+        print(f"  - experiments/ (all {len(result_files)} experiments)")
+        print("\n" + "="*80)
+        
+    except Exception as e:
+        print(f"\n⚠️  Error copying to Drive: {e}")
+        print("Results are still available locally in /content/Medical-Image-Segmentation/reports/")
+else:
+    print("\n" + "="*80)
+    print("✅ RESULTS SAVED LOCALLY")
+    print("="*80)
+    print(f"\n📁 Local Location: {local_reports_dir}")
+    print(f"\nContents:")
+    print(f"  - FINAL_REPORT.md")
+    print(f"  - results_summary.csv")
+    print(f"  - results_detailed.csv")
+    print(f"  - figures/results_comparison.png")
+    print(f"  - figures/performance_trends.png")
+    print(f"\n💡 To save to Google Drive:")
+    print(f"   1. Mount Drive: from google.colab import drive; drive.mount('/content/drive')")
+    print(f"   2. Re-run this script")
+    print("\n" + "="*80)
