@@ -169,13 +169,15 @@ def plot_predictions(
         axes[i, 0].set_title('Original Image')
         axes[i, 0].axis('off')
         
-        # Ground truth mask
-        axes[i, 1].imshow(masks[i], cmap='gray')
+        # Ground truth mask - ensure 2D
+        mask_2d = masks[i].squeeze() if masks[i].ndim > 2 else masks[i]
+        axes[i, 1].imshow(mask_2d, cmap='gray')
         axes[i, 1].set_title('Ground Truth')
         axes[i, 1].axis('off')
         
-        # Prediction
-        axes[i, 2].imshow(predictions[i], cmap='gray')
+        # Prediction - ensure 2D
+        pred_2d = predictions[i].squeeze() if predictions[i].ndim > 2 else predictions[i]
+        axes[i, 2].imshow(pred_2d, cmap='gray')
         axes[i, 2].set_title('Prediction')
         axes[i, 2].axis('off')
     
