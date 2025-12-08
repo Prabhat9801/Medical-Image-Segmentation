@@ -148,8 +148,20 @@ def evaluate(args):
             if idx < args.num_vis:
                 # Convert to numpy
                 image_np = images[0].cpu().numpy()
-                mask_np = masks[0, 0].cpu().numpy()
-                pred_np = torch.sigmoid(outputs[0, 0]).cpu().numpy()
+                
+                # Handle mask shape - could be [H, W] or [1, H, W]
+                mask_tensor = masks[0]
+                if mask_tensor.dim() == 3:  # [1, H, W]
+                    mask_np = mask_tensor[0].cpu().numpy()
+                else:  # [H, W]
+                    mask_np = mask_tensor.cpu().numpy()
+                
+                # Handle prediction shape
+                pred_tensor = torch.sigmoid(outputs[0])
+                if pred_tensor.dim() == 3:  # [1, H, W]
+                    pred_np = pred_tensor[0].cpu().numpy()
+                else:  # [H, W]
+                    pred_np = pred_tensor.cpu().numpy()
                 pred_np = (pred_np > 0.5).astype(np.float32)
                 
                 # Denormalize image
